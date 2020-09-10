@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tic Tac Toe</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link href="css/style.css" rel="stylesheet"> -->
+        <style>
+            body {
+                background-color: #243447;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            #tictactoe, tr, td {
+                border: 2px solid cyan;
+                table-layout: fixed;
+                width: 2em;
+                margin: auto;
+            }
+            .box {
+                padding: .1em;
+                width: 2em;
+                height: 2em;
+                min-width: 2em;
+                min-height: 2em;
+                margin: auto;
+                text-align: center;
+                font-size: 2em;
+                font-family: sans-serif;
+                color: cyan;
+            }
+            #resetBtn {
+                margin: 0 auto;
+                padding: 0.6em;
+                font-family: sans-serif;
+                background-color: #303030;
+                color: cyan;
+            }
+        </style>
+    </head>
+    <body>
+        <br />
+        <div class="container">
+            <table id="tictactoe"></table>
+            <button id="resetBtn">Reset</button>
+        </div>
+        <script>
+            // board array
+            // current player
+            // is full?
+            // board check
+            
+            // let board = new Array(3).fill(9);
+            // var boxes = document.querySelectorAll('.box');
+            // console.log(boxes[1])
+
+            const P1 = 'X';
+            const P2 = 'O';
+
+            var createBoard = (dim) => {
+                if(dim < 3) {
+                    dim = 3;
+                }
+                let board = [];
+                for(let i=0; i<dim; i++) {
+                    board.push(new Array(dim));
+                }
+                return board;
+            }
+
+            let board = createBoard(3);
+            
+            const winP1 = P1.repeat(board.length);
+            const winP2 = P2.repeat(board.length);
+            
+            // console.log(winP1);
+            // console.log(winP2);
+
+            let PIECE_COUNT = 0;
+
+            var createBoardUI = (board, tableId) => {
+                let table = document.querySelector('#'+tableId);
+                table.innerHTML = '';   // clear array
+                for (let i=0; i<board.length; i++) {
+                    let tr = document.createElement('tr');
+                    for (let j = 0; j < board.length; j++) {
+                        let td = document.createElement('td');
+                        td.className += 'box';
+
+                        td.addEventListener('click', (e) => {
+                            console.log(e.target.parentNode.rowIndex + ' ' + e.target.cellIndex);
+                            
+                            let row = e.target.parentNode.rowIndex;
+                            let col = e.target.cellIndex;
+                            
+                            console.log('PIECE_COUNT ' + PIECE_COUNT);
+                            // update UI and backend board
+                            if (PIECE_COUNT < (board.length ** 2)
+                            && e.target.innerHTML !== P1
+                            && e.target.innerHTML !== P2) {
+                                if (PIECE_COUNT % 2 == 0) {
+                                    e.target.innerHTML = P1;
+                                    board[row][col] = P1;
+                                } else {
+                                    e.target.innerHTML = P2;
+                                    board[row][col] = P2;
+                                }
+                                PIECE_COUNT++;
+
+                                // winning condition here
+                                console.log(board);
+                                
+                                // endgame condition here
+                                // if board full
+                                if(checkWinner(board) || PIECE_COUNT == (board.length ** 2)) {
+                                    // reset board
+                                    resetBoard();
+                                }
+
+                            }        
+
+                        });
+
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                }
+                return table;
+            }
+            
+
+            let table = createBoardUI(board, 'tictactoe');
+
+            var checkWinner = (board) => {
+                
+
+                // read columns
+                let cols = [];
+                for (let i = 0; i < board.length; i++) {
+                    let tempStr = '';
+                    for (let j=0; j<board.length; j++) {
+                        tempStr += board[j][i];
+                    }
+                    cols.push(tempStr);    
+                }
+
+                for (let i = 0; i < board.length; i++) {
+                    // row checks
+                    if (board[i].join('') == winP1) {
+                        alert(P1 + ' won!');
+                        return true;
+                    }
+                    if (board[i].join('') == winP2) {
+                        alert(P2 + ' won!');
+                        return true;
+                    }
+                    // col checks
+                    if (cols[i] == winP1) {
+                        alert(P1 + ' won!');
+                        return true;
+                    }
+                    if (cols[i] == winP2) {
+                        alert(P2 + ' won!');
+                        return true;
+                    }
+                }
+                
+                // console.log('cols');
+                // console.log(cols);
+
+                // read diagonals
+                let d1 = '';    // upper left to lower right
+                for (let i = 0; i < board.length; i++) {
+                    d1 += board[i][i];
+                }
+
+                let d2 = '';    // lower left to upper right
+                for (let i = 0; i < board.length; i++) {
+                    d2 += board[board.length-1-i][i];
+                }
+
+                console.log('d1')
+                console.log(d1)
+                console.log('d2')
+                console.log(d2)
+
+                // diagonal check
+                if (winP1 == d1 || winP1 == d2) {
+                    alert(P1 + ' won!');
+                    return true;
+                }
+
+                if (winP2 == d1 || winP2 == d2) {
+                    alert(P2 + ' won!');
+                    return true;
+                }
+
+
+                if(PIECE_COUNT == board.length**2) {
+                    alert('no one won :(');
+                }
+                return false;
+            }
+            
+            let resetBoard = () => {
+                board = createBoard(3);
+                table = createBoardUI(board, 'tictactoe');
+                PIECE_COUNT = 0;
+            }
+
+            let resetBtn = document.querySelector('resetBtn');
+            resetBtn.addEventListener('click', resetBoard());
+        </script>
+    </body>
+</html>
