@@ -8,12 +8,19 @@
         <style>
             body {
                 background-color: #243447;
+                text-align: center;
+                font-family: sans-serif;
             }
             .container {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
             }
+
+            .container > * {
+                margin-top: 1em;
+            }
+
             #tictactoe, tr, td {
                 border: 2px solid cyan;
                 table-layout: fixed;
@@ -32,11 +39,18 @@
                 font-family: sans-serif;
                 color: cyan;
             }
-            #resetBtn {
-                margin: 0 auto;
+            .box:hover {
+                background-color: #3c526d;
+                color: rgba(0, 204, 255, 0.562);
+            }
+            #reset-btn {
+                margin: auto;
                 padding: 0.6em;
                 font-family: sans-serif;
                 background-color: #303030;
+                color: cyan;
+            }
+            #turn-indicator {
                 color: cyan;
             }
         </style>
@@ -45,7 +59,9 @@
         <br />
         <div class="container">
             <table id="tictactoe"></table>
-            <button id="resetBtn">Reset</button>
+            <br />
+            <button id="reset-btn">Reset</button>
+            <span id="turn-indicator">X's turn</span>
         </div>
         <script>
             // board array
@@ -56,6 +72,8 @@
             // let board = new Array(3).fill(9);
             // var boxes = document.querySelectorAll('.box');
             // console.log(boxes[1])
+
+            let turnIndicator = document.querySelector('#turn-indicator');
 
             const P1 = 'X';
             const P2 = 'O';
@@ -104,9 +122,11 @@
                                 if (PIECE_COUNT % 2 == 0) {
                                     e.target.innerHTML = P1;
                                     board[row][col] = P1;
+                                    turnIndicator.innerHTML = P2 + "'s turn";
                                 } else {
                                     e.target.innerHTML = P2;
                                     board[row][col] = P2;
+                                    turnIndicator.innerHTML = P1 + "'s turn";
                                 }
                                 PIECE_COUNT++;
 
@@ -209,10 +229,18 @@
                 board = createBoard(3);
                 table = createBoardUI(board, 'tictactoe');
                 PIECE_COUNT = 0;
+                turnIndicator.innerHTML = "X's turn";
             }
 
-            let resetBtn = document.querySelector('resetBtn');
-            resetBtn.addEventListener('click', resetBoard());
+            let resetBtn = document.querySelector('#reset-btn');
+            resetBtn.addEventListener('click', () => {
+                if(PIECE_COUNT == 0) {
+                    return;
+                }
+                if(confirm('Are you sure you want to reset?')) {
+                    resetBoard();
+                }
+            });
         </script>
     </body>
 </html>
